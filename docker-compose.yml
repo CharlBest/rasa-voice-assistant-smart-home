@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+    # docker run -it -p 5005:5005 -v C:/Users/Best/Desktop/smart_home/rasa:/app rasa/rasa:latest-full train
+    # commands: train, run, run --debug, interactive
+    rasa:
+        container_name: rasa
+        image: rasa/rasa:latest-full
+        ports:
+            - 5005:5005
+        volumes:
+            - ./rasa:/app
+        command:
+            - run
+
+
+
+    docker run --init -d --name="home-assistant" -e "TZ=Europe/Dublin" -v //c/Users/Best/Desktop/Smart_Home/config:/config -p 8123:8123 homeassistant/home-assistant:stable
+
+
+    docker run -it -p 1880:1880 --name mynodered nodered/node-red

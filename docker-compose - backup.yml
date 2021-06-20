@@ -1,0 +1,204 @@
+version: '3'
+
+services:
+    home-assistant:
+        container_name: home-assistant
+        image: homeassistant/raspberrypi3-homeassistant:stable
+        volumes:
+            - ${USERDIR}/home-assistant/config:/config
+            - /etc/localtime:/etc/localtime:ro
+        # devices:
+        #     - /dev/ttyUSB0:/dev/ttyUSB0
+        #     - /dev/ttyUSB1:/dev/ttyUSB1
+        #     - /dev/ttyACM0:/dev/ttyACM0
+        environment:
+            - TZ=${TZ}
+        restart: always
+        network_mode: host
+
+    #   traefik:
+    #     container_name: "traefik"
+    #     image: "traefik:latest"
+    #     command:
+    #       # - "--log.level=DEBUG"
+    #         - "--api.insecure=true"
+    #         - "--providers.docker=true"
+    #         - "--providers.docker.exposedbydefault=false"
+    #         - "--entrypoints.web.address=:80"
+    #     ports:
+    #         - "80:80"
+    #         - "8080:8080"
+    #     volumes:
+    #         - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+    # webthings-gateway:
+    #     container_name: webthings-gateway
+    #     image: mozillaiot/gateway:arm
+    #     restart: unless-stopped
+    #     network_mode: host
+    #     # ports:
+    #     #  - "8080:8080"
+    #     #  - "4443:4443"
+    #     environment:
+    #         - "TZ=Europe/Dublin"
+    #     volumes:
+    #         - /home/pi/smarthome/webthings-gateway:/home/node/.mozilla-iot
+
+    node-red:
+        container_name: node-red
+        image: nodered/node-red
+        volumes:
+            - ${USERDIR}/node-red/data:/data
+            - /etc/localtime:/etc/localtime:ro
+        user: root # Not correct way of solving the problem
+        environment:
+            - TZ=${TZ}
+        # ports:
+        #     - "1880:1880" # UI
+        restart: always
+        network_mode: host
+    
+    mosquitto:
+        container_name: mosquitto
+        image: eclipse-mosquitto
+        volumes:
+            # - ${USERDIR}/mosquitto/config:/mosquitto/config/ # custom conf needed
+            - ${USERDIR}/mosquitto/log:/mosquitto/log
+            - ${USERDIR}/mosquitto/data:/mosquitto/data
+            - /etc/localtime:/etc/localtime:ro
+        ports:
+            - "1883:1883" # MQTT, unencrypted
+            - "9001:9001" # MQTT over websockets
+            # - "8883:8883" # MQTT, encrypted
+        restart: always
+        network_mode: host
+
+    # motioneye:
+    #     container_name: motioneye
+    #     image: ccrisan/motioneye:master-amd64
+    #     ports:
+    #         - "8081:8081" # 1st camera
+    #         - "8765:8765" # UI
+    #     volumes:
+    #         - ${USERDIR}/motioneye:/etc/motioneye
+    #         - ${USERDIR}/motioneye:/var/lib/motioneye
+
+    # rhasspy:
+    #     container_name: rhasspy
+    #     image: synesthesiam/rhasspy-server:latest
+    #     restart: unless-stopped
+    #     volumes:
+    #         - ${USERDIR}/rhasspy/profiles:/profiles
+    #     ports:
+    #         - "12101:12101"
+    #     devices:
+    #         - "/dev/snd:/dev/snd"
+    #     command: --user-profiles /profiles --profile en
+
+    # grocy:
+    #     container_name: grocy
+    #     image: linuxserver/grocy
+    #     environment:
+    #         - PUID=1000
+    #         - PGID=1000
+    #         - TZ=${TZ}
+    #     volumes:
+    #         - ${USERDIR}/grocy/config:/config
+    #     ports:
+    #         - 9283:80
+    #     restart: unless-stopped
+
+    portainer:
+        container_name: portainer
+        image: portainer/portainer
+        command: -H unix:///var/run/docker.sock
+        restart: always
+        ports:
+            - 9000:9000
+            - 8000:8000
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ${USERDIR}/portainer/data:/data
+
+    # crontab-ui:
+    #     container_name: crontab-ui
+    #     image: alseambusher/crontab-ui
+    #     ports:
+    #         - "8010:8000"
+
+    # duplicati:
+    #     container_name: duplicati
+    #     image: duplicati/duplicati
+    #     volumes:
+    #         - ${USERDIR}/duplicati/data:/data
+    #         - ${USERDIR}:/source
+    #     ports:
+    #         - 8200:8200
+    #     restart: unless-stopped
+
+    # tasmoadmin:
+    #     container_name: tasmoadmin
+    #     image: raymondmm/tasmoadmin
+    #     ports:
+    #         - "8011:80"
+    #     volumes:
+    #         - ${USERDIR}/tasmoadmin/data:/data
+
+    # influxdb:
+    #     container_name: influxdb
+    #     image: influxdb
+    #     ports:
+    #         - "8086:8086"
+    #     volumes:
+    #         - ${USERDIR}/influxdb:/var/lib/influxdb
+
+    # gitea:
+    #     container_name: gitea
+    #     image: gitea/gitea:latest
+    #     environment:
+    #       - USER_UID=1000
+    #       - USER_GID=1000
+    #     restart: always
+    #     volumes:
+    #       - ${USERDIR}/gitea/data:/data
+    #       - /etc/timezone:/etc/timezone:ro
+    #       - /etc/localtime:/etc/localtime:ro
+    #     ports:
+    #       - "3000:3000" # HTTP (UI)
+    #       - "222:22" # SSH
+
+    # openvpn-as:
+    #     container_name: openvpn-as
+    #     image: linuxserver/openvpn-as
+    #     cap_add:
+    #         - NET_ADMIN
+    #     environment:
+    #         - PUID=1000
+    #         - PGID=1000
+    #         - TZ=${TZ}
+    #         - INTERFACE=eth0 # optional
+    #     volumes:
+    #         - ${USERDIR}/openvpn-as/config:/config
+    #     ports:
+    #         - 943:943 # Admin GUI
+    #         - 9443:9443 # TCP
+    #         - 1194:1194/udp # UDP
+    #     restart: unless-stopped
+
+    # sikulix:
+    #     container_name: sikulix
+    #     image: openjdk:7
+    #     volumes:
+    #         - ${USERDIR}/sikulix:/app
+    #     working_dir: /app
+    #     command: java Main
+
+# raspberry pi node red data folder on main server as virtual volumn (will maybe increase network traffic)
+ 
+# Lets Encrypt
+# Pi-Hole
+# Bitwarden
+ 
+# Chronograf
+# fail2ban
+# ddos-blackhole

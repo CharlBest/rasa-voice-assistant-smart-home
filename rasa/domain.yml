@@ -1,0 +1,62 @@
+intents:
+  - light_switch
+  - light_dim
+  - light_color
+  - room
+  - color
+  - climate_temperature
+  - climate_humidity
+  - weather
+  - broadcast
+  - alarm_create
+  - alarm_read
+  - alarm_update
+  - alarm_delete
+  - alarm_day
+  - bot_challenge
+
+entities:
+  - action
+  - device
+  - room
+  - color
+  - dim_percentage
+  - broadcast_text
+  - alarm_time
+  - alarm_day
+  - alarm_repeat
+  - alarm_name
+
+# TODO: add lookups, synonyms, regex and slots to nlu file
+
+slots:
+  dim_percentage:
+    type: float
+    min_value: 0.0
+    max_value: 100.0
+  broadcast_text:
+    type: text
+
+actions:
+  - light_switch_action
+  - light_dim_action
+  - light_color_action
+  - climate_temperature_action
+  - climate_humidity_action
+  - weather_action
+  - broadcast_action
+  - alarm_create_action
+  - alarm_read_action
+  - alarm_update_action
+  - alarm_delete_action
+  - utter_iamabot
+
+responses:
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa."
+  action_default_fallback:
+  - text: "Sorry I don't understand."
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
